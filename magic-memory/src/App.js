@@ -18,6 +18,7 @@ function App() {
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState(null);
   const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false)
 
   const shuffleCards = () => {
     // Spread syntax, will place each element in array
@@ -29,12 +30,21 @@ function App() {
     // For each element, fire function that adds id prop & value
     // card represents element in scope, gets properties, then adds id property
 
+    setChoiceOne(null);
+    setChoiceTwo(null);
     setCards(shuffledCards);
     setTurns(0);
   };
 
   useEffect(() => {
+    shuffleCards();
+  },[])
+
+
+  useEffect(() => {
     if (choiceOne && choiceTwo) {
+      setDisabled(true);
+      // When disabled true, prevent all cards from being clicked
       if (choiceOne.src === choiceTwo.src) {
         console.log("Match!");
         // Use previous card state to update state
@@ -51,7 +61,7 @@ function App() {
         });
         resetTurn();
       } else {
-        setTimeout(() => resetTurn(),1000);
+        setTimeout(() => resetTurn(),650);
       }
     }
   }, [choiceOne, choiceTwo]);
@@ -73,6 +83,7 @@ function App() {
     setChoiceOne(null);
     setChoiceTwo(null);
     setTurns((prevTurns) => prevTurns + 1);
+    setDisabled(false);
   };
 
   return (
@@ -86,9 +97,11 @@ function App() {
             key={card.id}
             handleChoice={handleChoice}
             flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
           />
         ))}
       </div>
+      <p>Turns: {turns}</p>
     </div>
   );
 }
