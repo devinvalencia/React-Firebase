@@ -1,25 +1,24 @@
 import "./App.css";
-import { useState } from "react";
+import SingleCard from "./components/SingleCard";
+import { useEffect, useState } from "react";
 
 // Create Array of Cards, Is Constant, Dont need comp
 // Won't get re-created every render if made outside comp
 const cardImages = [
-  { src: "/img/helmet-1.png" },
-  { src: "/img/potion-1.png" },
-  { src: "/img/ring-1.png" },
-  { src: "/img/scroll-1.png" },
-  { src: "/img/shield-1.png" },
-  { src: "/img/sword-1.png" },
+  { src: "/img/helmet-1.png", matched: false },
+  { src: "/img/potion-1.png", matched: false },
+  { src: "/img/ring-1.png", matched: false },
+  { src: "/img/scroll-1.png", matched: false },
+  { src: "/img/shield-1.png", matched: false },
+  { src: "/img/sword-1.png", matched: false },
 ];
 
 function App() {
   const [cards, setCards] = useState([]);
   const [turns, setTurns] = useState(0);
+  const [choiceOne, setChoiceOne] = useState(null);
+  const [choiceTwo, setChoiceTwo] = useState(null);
 
-
-  // Duplicate Each Card
-  // Randomize order of cards in array
-  // Apply random id for each card
   const shuffleCards = () => {
     // Spread syntax, will place each element in array
     // Will do again with second refenence
@@ -34,20 +33,60 @@ function App() {
     setTurns(0);
   };
 
-  console.log(cards,turns);
+  useEffect(() => {
+    if (choiceOne && choiceTwo) {
+      if (choiceOne.src === choiceTwo.src) {
+        console.log("Match!");
+        // Use previous card state to update state
+        // where is prevCards defined ???
+        // Map method returns new array based on array its using
+        setCards((prevCards) => {
+          return prevCards.map((card) => {
+            if (card.src === choiceOne.src) {
+              return { ...card, matched: true };
+            } else {
+              return card;
+            }
+          });
+        });
+        resetTurn();
+      } else {
+        setTimeout(() => resetTurn(),1000);
+      }
+    }
+  }, [choiceOne, choiceTwo]);
+
+  // Handle Choice
+  const handleChoice = (card) => {
+    if (choiceOne) {
+      setChoiceTwo(card);
+      console.log("Choice 2 is: " + card.src);
+      // Cant compare here because state updates are scheduled
+      // Code will run before state updated, so it wont work here
+    } else {
+      setChoiceOne(card);
+      console.log("Choice 1 is: " + card.src);
+    }
+  };
+
+  const resetTurn = () => {
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setTurns((prevTurns) => prevTurns + 1);
+  };
 
   return (
     <div className="App">
       <h1>Match</h1>
       <button onClick={shuffleCards}>New Game</button>
       <div className="card-grid">
-        {cards.map(card => (
-          <div className="card" key={card.id}>
-            <div>
-              <img className="frnt" src={card.src} alt="card front" />
-              <img className="back" src="/img/cover.png" alt="card back" />
-            </div>
-          </div>
+        {cards.map((card) => (
+          <SingleCard
+            card={card}
+            key={card.id}
+            handleChoice={handleChoice}
+            flipped={card === choiceOne || card === choiceTwo || card.matched}
+          />
         ))}
       </div>
     </div>
