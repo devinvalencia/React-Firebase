@@ -1,5 +1,6 @@
 import "./App.css";
 import { useState } from "react";
+import Card from "./Components/Card";
 
 // Create Array of Cards, Is Constant, Dont need comp
 // Won't get re-created every render if made outside comp
@@ -40,8 +41,11 @@ function App() {
     <div className="App">
       <h1>Match</h1>
       <button onClick={shuffleCards}>New Game</button>
+      <Card cards={cards} />
     </div>
   );
 }
+
+// Button sets Cards, Card displays them
 
 export default App;
